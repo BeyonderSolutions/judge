@@ -1,9 +1,11 @@
 import io
-import sys
-import flake8.main.application
 import os
-from rich import print
+import sys
+
+import flake8.main.application as f8
 from dotenv import load_dotenv
+from rich import print
+
 
 class FakeFile(io.StringIO):
     def __init__(self):
@@ -20,8 +22,6 @@ class FakeFile(io.StringIO):
         return super().getvalue()
 
 
-
-
 def flake8_to_dict(path_to_code):
     base_dir = os.path.commonpath([path_to_code])
     
@@ -30,7 +30,7 @@ def flake8_to_dict(path_to_code):
     sys.stdout = FakeFile()
 
     # Initialize and run flake8
-    app = flake8.main.application.Application()
+    app = f8.Application()
     app.initialize([
         '--exclude=venv,.venv,your_project/external_packages,*/site-packages/*',
         path_to_code
@@ -60,7 +60,6 @@ def flake8_to_dict(path_to_code):
     return results
 
 
-# Example usage
 load_dotenv()
 report = flake8_to_dict(os.getenv("DIR"))
 print(report)
