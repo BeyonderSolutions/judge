@@ -61,24 +61,38 @@ def flake8_to_dict(path_to_code):
     return results
 
 
-def print_flake8_report(report):
-    for file_path, issues in report.items():
-        table = Table(title=file_path)
+def print_flake8_report(report, markdown_file_path):
+    with open(markdown_file_path, 'w') as md_file:
+        for file_path, issues in report.items():
+            table = Table(title=file_path)
 
-        # Define columns
-        table.add_column("Line", justify="right")
-        table.add_column("Col.", justify="right")
-        table.add_column("Code")
-        table.add_column("Message")
+            # Define columns
+            table.add_column("Line", justify="right")
+            table.add_column("Col.", justify="right")
+            table.add_column("Code")
+            table.add_column("Message")
 
-        # Add rows for each issue
-        for issue in issues:
-            table.add_row(str(issue["line"]), str(issue["column"]), issue["error_code"], issue["message"])
+            # Markdown table header
+            md_file.write(f"### {file_path}\n\n")
+            md_file.write("| Line | Col. | Code | Message |\n")
+            md_file.write("|------|------|------|---------|\n")
 
-        # Print the table
-        print(table)
+            # Add rows for each issue
+            for issue in issues:
+                line_str = str(issue["line"])
+                col_str = str(issue["column"])
+                code = issue["error_code"]
+                message = issue["message"]
+                table.add_row(line_str, col_str, code, message)
+                # Add Markdown row
+                md_file.write(f"| {line_str} | {col_str} | {code} | {message} |\n")
+
+            # Print the table to console
+            print(table)
+
 
 
 load_dotenv()
 report = flake8_to_dict(os.getenv("DIR"))
-print_flake8_report(report)
+markdown_file_path = 'flake8_report.md'
+print_flake8_report(report, markdown_file_path)
