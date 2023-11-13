@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from rich import print
 from rich.table import Table
 
+LINK_CODES = "https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes"
+LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
 class FakeFile(io.StringIO):
     def __init__(self):
@@ -60,9 +62,15 @@ def flake8_to_dict(path_to_code):
 
     return results
 
+def md_link(content, link):
+    return f"[{content}]({link})"
+
 
 def print_flake8_report(report, markdown_file_path):
     with open(markdown_file_path, 'w') as md_file:
+        md_file.write("# Judge Report\n")
+        md_file.write("## ❄️ flake8\n")
+        md_file.write(f"Review for {md_link('PEP8', LINK_PEP8)} compliance.\n")
         for file_path, issues in report.items():
             table = Table(title=file_path)
 
@@ -75,7 +83,7 @@ def print_flake8_report(report, markdown_file_path):
             # Markdown table header
             md_file.write(f"### {file_path}\n\n")
             md_file.write("| Line | Col. | Code | Message |\n")
-            md_file.write("|------|------|------|---------|\n")
+            md_file.write("|-----:|-----:|------|---------|\n")
 
             # Add rows for each issue
             for issue in issues:
@@ -85,7 +93,7 @@ def print_flake8_report(report, markdown_file_path):
                 message = issue["message"]
                 table.add_row(line_str, col_str, code, message)
                 # Add Markdown row
-                md_file.write(f"| {line_str} | {col_str} | {code} | {message} |\n")
+                md_file.write(f"| {line_str} | {col_str} | {md_link(code, LINK_CODES)} | {message} |\n")
 
             # Print the table to console
             print(table)
