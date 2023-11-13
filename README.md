@@ -1,2 +1,2 @@
-# judge
-⚖️ Lazily review Python project inconsistencies and vulnerabilities.
+# ⚖️ judge
+Lazily review Python project inconsistencies and vulnerabilities.
