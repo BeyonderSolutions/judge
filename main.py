@@ -5,6 +5,7 @@ import sys
 import flake8.main.application as f8
 from dotenv import load_dotenv
 from rich import print
+from rich.table import Table
 
 
 class FakeFile(io.StringIO):
@@ -54,12 +55,30 @@ def flake8_to_dict(path_to_code):
                 'line': int(line_no),
                 'column': int(col_no),
                 'error_code': error_code,
-                'message': msg.strip()
+                'message': msg.strip()[5:]
             })
 
     return results
 
 
+def print_flake8_report(report):
+    for file_path, issues in report.items():
+        table = Table(title=file_path)
+
+        # Define columns
+        table.add_column("Line", justify="right")
+        table.add_column("Col.", justify="right")
+        table.add_column("Code")
+        table.add_column("Message")
+
+        # Add rows for each issue
+        for issue in issues:
+            table.add_row(str(issue["line"]), str(issue["column"]), issue["error_code"], issue["message"])
+
+        # Print the table
+        print(table)
+
+
 load_dotenv()
 report = flake8_to_dict(os.getenv("DIR"))
-print(report)
+print_flake8_report(report)
