@@ -13,7 +13,9 @@ setup(
     url="https://github.com/BeyonderSolutions/judge",
     author="Rodrigo Gómez Maitret",
     author_email="rodrigo@beyondersolutions.com",
-    packages=find_packages(),
+    packages=find_packages(
+        include=["judge", "judge.*"]
+    ),
     entry_points={
         "console_scripts": [
             "judge = judge.judge:main"
