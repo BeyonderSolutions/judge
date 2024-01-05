@@ -1,4 +1,4 @@
-![judge](https://img.shields.io/badge/judge-0.1.1-green) ![flake8](https://img.shields.io/badge/flake8-6.1.0-blue)
+![judge](https://img.shields.io/badge/judge-0.1.2-green) ![flake8](https://img.shields.io/badge/flake8-6.1.0-blue)
 
 # ⚖️ judge
 Lazily review Python project inconsistencies and vulnerabilities.
