@@ -112,5 +112,6 @@ def print_flake8_report(report, markdown_file_path):
             # Print the table to console
             print(table)
 
+
 if __name__ == "__main__":
     main()
