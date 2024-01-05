@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import sys
 
 import flake8.main.application as f8
@@ -59,13 +60,21 @@ def flake8_to_dict(path_to_code):
             # Remove base directory from file path
             relative_path = os.path.relpath(file, base_dir)
             error_code = msg.strip().split(' ')[0]
-            # Append the issue to the results dict
-            results.setdefault(relative_path, []).append({
-                'line': int(line_no),
-                'column': int(col_no),
-                'error_code': error_code,
-                'message': msg.strip()[5:]
-            })
+            # Parse everything.
+            pattern = re.compile(r"(.*\.py):(\d+):(\d+): (\w+) (.*)")
+            try:
+                match = pattern.match(line)
+                results.setdefault(relative_path, []).append({
+                    "file": match.group(1),
+                    "line": int(match.group(2)),
+                    "column": int(match.group(3)),
+                    "error_code": match.group(4),
+                    "message": match.group(5)
+                })
+            except Exception as e:
+                print(e)
+                print("There was an error parsing the following flake8 line:")
+                print(line)
     return results
 
 
