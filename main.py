@@ -9,6 +9,7 @@ from rich.table import Table
 LINK_CODES = "https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes"
 LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
+
 class FakeFile(io.StringIO):
     def __init__(self):
         super().__init__()
@@ -23,11 +24,13 @@ class FakeFile(io.StringIO):
     def getvalue(self):
         return super().getvalue()
 
+
 def main():
     dir = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
     report = flake8_to_dict(dir)
     markdown_file_path = 'flake8_report.md'
     print_flake8_report(report, markdown_file_path)
+
 
 def flake8_to_dict(path_to_code):
     base_dir = os.path.commonpath([path_to_code])
@@ -37,7 +40,9 @@ def flake8_to_dict(path_to_code):
     # Initialize and run flake8
     app = f8.Application()
     app.initialize([
-        '--exclude=venv,.venv,wenv,.wenv,your_project/external_packages,*/site-packages/*',
+        "--exclude=*env*,.*env*," +
+        "your_project/external_packages," +
+        "*/site-packages/*",
         path_to_code
     ])
     app.run_checks()
@@ -62,6 +67,7 @@ def flake8_to_dict(path_to_code):
             })
     return results
 
+
 def md_link(content, link):
     return f"[{content}]({link})"
 
@@ -70,7 +76,8 @@ def print_flake8_report(report, markdown_file_path):
     with open(markdown_file_path, 'w', encoding="utf-8") as md_file:
         md_file.write("# ⚖️ Judge Report\n")
         md_file.write("## ❄️ flake8\n")
-        md_file.write(f"Python code review for {md_link('PEP8', LINK_PEP8)} compliance.\n")
+        pep8_link = md_link("PEP8", LINK_PEP8)
+        md_file.write(f"Python code review for {pep8_link} compliance.\n")
         for file_path, issues in report.items():
             table = Table(title=file_path, title_justify="left")
             # Define columns
@@ -90,6 +97,9 @@ def print_flake8_report(report, markdown_file_path):
                 message = issue["message"]
                 table.add_row(line_str, col_str, code, message)
                 # Add Markdown row
-                md_file.write(f"| {line_str} | {col_str} | {md_link(code, LINK_CODES)} | {message} |\n")
+                code_link = md_link(code, LINK_CODES)
+                md_file.write(
+                    f"| {line_str} | {col_str} | {code_link} | {message} |\n"
+                )
             # Print the table to console
             print(table)
