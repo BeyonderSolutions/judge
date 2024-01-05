@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="judge",
-    version="0.1.0",
+    version="0.1.2",
     description="Lazily review Python project " +
     "inconsistencies and vulnerabilities.",
     long_description=long_description,
@@ -13,14 +13,16 @@ setup(
     url="https://github.com/BeyonderSolutions/judge",
     author="Rodrigo Gómez Maitret",
     author_email="rodrigo@beyondersolutions.com",
-    packages=find_packages(),
+    packages=find_packages(
+        include=["judge", "judge.*"]
+    ),
     entry_points={
         "console_scripts": [
-            "judge = main:main"
+            "judge = judge.judge:main"
         ]
     },
     install_requires=[
         "rich",
-        "flake8",
+        "flake8==6.1.0",
     ]
 )
