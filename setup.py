@@ -21,6 +21,6 @@ setup(
     },
     install_requires=[
         "rich",
-        "flake8",
+        "flake8==6.1.0",
     ]
 )
