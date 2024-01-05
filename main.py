@@ -4,6 +4,7 @@ import sys
 
 import flake8.main.application as f8
 from rich import print
+from rich.panel import Panel
 from rich.table import Table
 
 LINK_CODES = "https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes"
@@ -78,6 +79,13 @@ def print_flake8_report(report, markdown_file_path):
         md_file.write("## ❄️ flake8\n")
         pep8_link = md_link("PEP8", LINK_PEP8)
         md_file.write(f"Python code review for {pep8_link} compliance.\n")
+        # Sanity check. If there are no issues, report will be empty.
+        if not report:
+            message = "✅ No issues found!"
+            md_file.write(f"\n>{message}\n")
+            print(Panel(message, title="Success", expand=False, style="green"))
+            return
+        # Loop through each issue.
         for file_path, issues in report.items():
             table = Table(title=file_path, title_justify="left")
             # Define columns
