@@ -29,7 +29,7 @@ class FakeFile(io.StringIO):
 def main():
     dir = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
     report = flake8_to_dict(dir)
-    markdown_file_path = 'flake8_report.md'
+    markdown_file_path = 'judge_report.md'
     print_flake8_report(report, markdown_file_path)
 
 

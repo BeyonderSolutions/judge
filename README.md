@@ -16,8 +16,13 @@ pip install git+https://github.com/BeyonderSolutions/judge.git
 judge
 ```
 
+
 ### Running on another directory
 
 ```bash
 judge /path/to/dir
 ```
+
+## Tips
+- ⚠️ Don't forget to ignore `judge_report.md` on your `.gitignore`!
+- 💡 If running on a **VS Code** terminal, you can `Ctrl`+`Left-Click` on a filename to open it directly on your IDE.
