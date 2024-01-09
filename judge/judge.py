@@ -8,6 +8,7 @@ from rich import print
 from rich.panel import Panel
 from rich.table import Table
 
+LINK_CODES = "https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes"
 LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
 
@@ -113,10 +114,7 @@ def print_flake8_report(report, markdown_file_path):
                 message = issue["message"]
                 table.add_row(line_str, col_str, code, message)
                 # Add Markdown row
-                code_link = md_link(
-                    code,
-                    f"https://www.flake8rules.com/rules/{code}.html"
-                )
+                code_link = md_link(code, LINK_CODES)
                 md_file.write(
                     f"| {line_str} | {col_str} | {code_link} | {message} |\n"
                 )
