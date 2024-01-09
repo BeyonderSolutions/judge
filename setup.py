@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="judge",
-    version="0.1.3",
+    version="0.1.4",
     description="Lazily review Python project inconsistencies "
     "and vulnerabilities.",
     long_description=long_description,
