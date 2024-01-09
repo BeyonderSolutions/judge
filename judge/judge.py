@@ -42,8 +42,9 @@ def flake8_to_dict(path_to_code):
     # Initialize and run flake8
     app = f8.Application()
     app.initialize([
-        "--exclude=*env*,.*env*," +
-        "your_project/external_packages," +
+        "--ignore=E402,F401,F403",
+        "--exclude=*env*,.*env*,"
+        "your_project/external_packages,"
         "*/site-packages/*",
         path_to_code
     ])
@@ -59,7 +60,6 @@ def flake8_to_dict(path_to_code):
             file, line_no, col_no, msg = line.rsplit(':', 3)
             # Remove base directory from file path
             relative_path = os.path.relpath(file, base_dir)
-            error_code = msg.strip().split(' ')[0]
             # Parse everything.
             pattern = re.compile(r"(.*\.py):(\d+):(\d+): (\w+) (.*)")
             try:
