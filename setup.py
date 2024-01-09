@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as f:
 setup(
     name="judge",
     version="0.1.2",
-    description="Lazily review Python project " +
-    "inconsistencies and vulnerabilities.",
+    description="Lazily review Python project inconsistencies "
+    "and vulnerabilities.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/BeyonderSolutions/judge",
