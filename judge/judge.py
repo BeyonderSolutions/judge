@@ -9,6 +9,7 @@ from rich import print
 from rich.panel import Panel
 from rich.table import Table
 
+FILE_REPORT = "judge_report.md"
 FILE_SETTINGS = "judge_settings.toml"
 LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
@@ -30,30 +31,37 @@ class FakeFile(io.StringIO):
 
 def main():
     dir = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
-    report = flake8_to_dict(dir)
-    markdown_file_path = 'judge_report.md'
     # Load the settings file.
     if os.path.exists(FILE_SETTINGS):
         with open(FILE_SETTINGS, "r", encoding="utf-8") as file:
             settings = toml.load(file)
-            print(settings)
+            print(f"Loaded settings from '{FILE_SETTINGS}'.")
     else:
         settings = {}
-    print_flake8_report(report, markdown_file_path)
+    # Flake8
+    report = flake8_to_dict(dir, settings=settings.get("flake8", {}))
+    print_flake8_report(report, FILE_REPORT)
 
 
-def flake8_to_dict(path_to_code):
+def flake8_to_dict(path_to_code: str, settings: dict = {}):
+    # Arguments for flake8.
+    ignore = f"--ignore={','.join(settings['ignore'])}" \
+        if settings.get("ignore", []) else ""
+    exclude = str(','.join(settings.get("exclude", [])))
+    # Initialize the flake8 application.
+    app = f8.Application()
+    # Base directory for relative paths.
     base_dir = os.path.commonpath([path_to_code])
     # Temporary redirect stdout to the custom FakeFile
     original_stdout = sys.stdout
     sys.stdout = FakeFile()
-    # Initialize and run flake8
-    app = f8.Application()
+
+    # Initialize and run flake8.
     app.initialize([
-        "--ignore=E402,F401,F403",
+        ignore,
         "--exclude=*env*,.*env*,"
         "your_project/external_packages,"
-        "*/site-packages/*",
+        "*/site-packages/*," + exclude,
         path_to_code
     ])
     app.run_checks()
@@ -100,7 +108,13 @@ def print_flake8_report(report, markdown_file_path):
         if not report:
             message = "✅ No issues found!"
             md_file.write(f"\n>{message}\n")
-            print(Panel(message, title="Success", expand=False, style="green"))
+            print(Panel(
+                message,
+                title="Success",
+                title_align="left",
+                expand=False,
+                style="green"
+            ))
             return
         # Loop through each issue.
         for file_path, issues in report.items():
