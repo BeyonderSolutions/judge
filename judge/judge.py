@@ -4,10 +4,12 @@ import re
 import sys
 
 import flake8.main.application as f8
+import toml
 from rich import print
 from rich.panel import Panel
 from rich.table import Table
 
+FILE_SETTINGS = "judge_settings.toml"
 LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
 
@@ -30,6 +32,13 @@ def main():
     dir = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
     report = flake8_to_dict(dir)
     markdown_file_path = 'judge_report.md'
+    # Load the settings file.
+    if os.path.exists(FILE_SETTINGS):
+        with open(FILE_SETTINGS, "r", encoding="utf-8") as file:
+            settings = toml.load(file)
+            print(settings)
+    else:
+        settings = {}
     print_flake8_report(report, markdown_file_path)
 
 
