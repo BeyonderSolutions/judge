@@ -33,7 +33,6 @@ def _flake8_to_dict(path_to_code: str, settings: dict = {}):
     # Temporary redirect stdout to the custom FakeFile
     original_stdout = sys.stdout
     sys.stdout = FakeFile()
-
     # Initialize and run flake8.
     app.initialize([
         ignore,

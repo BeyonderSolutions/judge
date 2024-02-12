@@ -21,6 +21,7 @@ def analyze_pytest(
     # Parse the XML report and write to the markdown report.
     _parse_and_write_pytest_report(report_xml_path, file_report)
 
+
 def _parse_and_write_pytest_report(report_xml_path, markdown_file_path):
     # Parse the XML file.
     tree = ET.parse(report_xml_path)
