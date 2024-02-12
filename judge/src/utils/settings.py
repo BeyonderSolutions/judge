@@ -1,6 +1,7 @@
 import os
 
 import toml
+from rich import print
 
 
 def load_settings(file_settings: str) -> dict:
