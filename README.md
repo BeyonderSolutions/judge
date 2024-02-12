@@ -1,7 +1,7 @@
-![judge](https://img.shields.io/badge/judge-0.1.5-green) ![flake8](https://img.shields.io/badge/flake8-6.1.0-blue)
+![judge](https://img.shields.io/badge/judge-0.1.5-green) ![flake8](https://img.shields.io/badge/flake8-6.1.0-blue) ![pytest](https://img.shields.io/badge/pytest-8.0.0-blue)
 
 # ⚖️ judge
-Lazily review Python project inconsistencies and vulnerabilities.
+Lazily review Python project inconsistencies, tests and vulnerabilities.
 
 ## Installation
 ```bash
@@ -27,7 +27,7 @@ judge /path/to/dir
 ### Running on a GitHub Workflow
 You create Judge reports from a GitHub Action. Here is an example that automatically posts a comment on a pull request using [thollander's actions-comment-pull-request](https://github.com/thollander/actions-comment-pull-request):
 <details>
-<summary>judge_report.yml</summary>
+<summary>📄 judge_report.yml</summary>
 
 ```yaml
 name: ⚖️ Judge

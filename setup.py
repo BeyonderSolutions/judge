@@ -24,5 +24,6 @@ setup(
     install_requires=[
         "rich",
         "flake8==6.1.0",
+        "pytest==8.0.0"
     ]
 )
