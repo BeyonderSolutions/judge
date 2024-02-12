@@ -18,11 +18,13 @@ setup(
     ),
     entry_points={
         "console_scripts": [
-            "judge = judge.judge:main"
+            "judge = judge:main"
         ]
     },
     install_requires=[
         "rich",
+        "toml",
         "flake8==6.1.0",
+        "pytest==8.0.0"
     ]
 )

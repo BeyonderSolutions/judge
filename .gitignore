@@ -2,6 +2,8 @@ judge_report.md
 judge_settings.toml
 *env*/
 playground/
+# Temp
+tests/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

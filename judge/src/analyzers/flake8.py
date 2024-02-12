@@ -1,49 +1,27 @@
-import io
 import os
 import re
 import sys
 
 import flake8.main.application as f8
-import toml
 from rich import print
 from rich.panel import Panel
 from rich.table import Table
 
-FILE_REPORT = "judge_report.md"
-FILE_SETTINGS = "judge_settings.toml"
+from ..classes import FakeFile
+from ..utils import md_link
+
 LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
 
-class FakeFile(io.StringIO):
-    def __init__(self):
-        super().__init__()
-        self.buffer = self
-
-    def write(self, s):
-        if isinstance(s, bytes):
-            # Decode bytes to a string and write
-            s = s.decode('utf-8')
-        super().write(s)
-
-    def getvalue(self):
-        return super().getvalue()
+def analyze_flake8(path_base: str, file_report: str, settings: dict = {}):
+    report = _flake8_to_dict(
+        path_to_code=path_base,
+        settings=settings.get("flake8", {})
+    )
+    _print_flake8_report(report, file_report)
 
 
-def main():
-    dir = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
-    # Load the settings file.
-    if os.path.exists(FILE_SETTINGS):
-        with open(FILE_SETTINGS, "r", encoding="utf-8") as file:
-            settings = toml.load(file)
-            print(f"Loaded settings from '{FILE_SETTINGS}'.")
-    else:
-        settings = {}
-    # Flake8
-    report = flake8_to_dict(dir, settings=settings.get("flake8", {}))
-    print_flake8_report(report, FILE_REPORT)
-
-
-def flake8_to_dict(path_to_code: str, settings: dict = {}):
+def _flake8_to_dict(path_to_code: str, settings: dict = {}):
     # Arguments for flake8.
     ignore = f"--ignore={','.join(settings['ignore'])}" \
         if settings.get("ignore", []) else ""
@@ -55,7 +33,6 @@ def flake8_to_dict(path_to_code: str, settings: dict = {}):
     # Temporary redirect stdout to the custom FakeFile
     original_stdout = sys.stdout
     sys.stdout = FakeFile()
-
     # Initialize and run flake8.
     app.initialize([
         ignore,
@@ -94,11 +71,7 @@ def flake8_to_dict(path_to_code: str, settings: dict = {}):
     return results
 
 
-def md_link(content, link):
-    return f"[{content}]({link})"
-
-
-def print_flake8_report(report, markdown_file_path):
+def _print_flake8_report(report, markdown_file_path):
     with open(markdown_file_path, 'w', encoding="utf-8") as md_file:
         md_file.write("# ⚖️ Judge Report\n")
         md_file.write("## ❄️ flake8\n")
@@ -145,7 +118,3 @@ def print_flake8_report(report, markdown_file_path):
                 )
             # Print the table to console
             print(table)
-
-
-if __name__ == "__main__":
-    main()
