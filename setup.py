@@ -23,6 +23,7 @@ setup(
     },
     install_requires=[
         "rich",
+        "toml",
         "flake8==6.1.0",
         "pytest==8.0.0"
     ]
