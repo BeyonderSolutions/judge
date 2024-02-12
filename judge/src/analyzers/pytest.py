@@ -3,39 +3,39 @@ from io import StringIO
 
 import pytest
 
+import xml.etree.ElementTree as ET
 
-def analyze_pytest(path_base: str, file_report: str):
-    # Redirect stdout to capture the pytest output
-    original_stdout = sys.stdout
-    sys.stdout = StringIO()
+def analyze_pytest(path_base: str, file_report: str, report_xml_path="pytest_report.xml"):
+    # Run pytest and generate an XML report
+    pytest.main([path_base, '--no-header', '--no-summary', '-rA', f'--junitxml={report_xml_path}'])
 
-    # Run pytest programmatically with options for detailed output
-    pytest.main([path_base, '-vv', '--no-header', '--no-summary', '-rA'])
+    # Parse the XML report and write to the markdown report
+    _parse_and_write_pytest_report(report_xml_path, file_report)
 
-    # Capture the pytest output
-    pytest_output = sys.stdout.getvalue()
+def _parse_and_write_pytest_report(report_xml_path, markdown_file_path):
+    # Parse the XML file
+    tree = ET.parse(report_xml_path)
+    root = tree.getroot()
 
-    # Restore stdout
-    sys.stdout = original_stdout
-
-    # Parse and print the pytest report
-    _print_pytest_report(pytest_output, file_report)
-
-def _print_pytest_report(pytest_output, markdown_file_path):
-    with open(markdown_file_path, 'a', encoding="utf-8") as md_file:  # Append mode
+    with open(markdown_file_path, 'a', encoding="utf-8") as md_file:
         md_file.write("\n## 🧪 pytest\n")
         md_file.write("Python pytest results.\n")
-        # Search for test failure indications
-        failures = [line for line in pytest_output.split('\n') if 'FAILED' in line]
-        if failures:
-            md_file.write("\n> Some tests have failed. See below for details.\n\n")
-            for failure in failures:
-                # Extract test name and failure reason (simplified)
-                test_name = failure.split("::")[-1].split(" ")[0]
-                reason = "Failure details not shown here. Check the test output for more information."
-                md_file.write(f"- **{test_name}**: {reason}\n")
-        else:
-            md_file.write("\n✅ All tests passed!\n")
 
-    # Optionally, print a summary or the entire pytest output to console
-    print(pytest_output)
+        testcases = root.findall(".//testcase")
+        failures_present = False
+
+        for testcase in testcases:
+            failures = testcase.findall("failure")
+            if failures:
+                failures_present = True
+                # Assuming 'classname' and 'name' attributes hold the test suite and test name respectively
+                test_name = f"{testcase.attrib.get('classname')}::{testcase.attrib.get('name')}"
+                md_file.write(f"- **{test_name}**: \n")
+                md_file.write("```\n")  # Markdown code block for readability
+                for failure in failures:
+                    md_file.write(failure.text.strip())  # Include the failure details
+                    md_file.write("\n")
+                md_file.write("```\n")
+
+        if not failures_present:
+            md_file.write("\n✅ All tests passed!\n")
