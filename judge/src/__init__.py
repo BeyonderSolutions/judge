@@ -1,7 +1,7 @@
 import os
 import sys
 
-from .analyzers import analyze_flake8
+from .analyzers import analyze_flake8, analyze_pytest
 from .utils import load_settings
 
 FILE_REPORT = "judge_report.md"
@@ -13,3 +13,4 @@ def main():
     settings: dict = load_settings(FILE_SETTINGS)
     # Analyzers
     analyze_flake8(path_base=dir, file_report=FILE_REPORT, settings=settings)
+    analyze_pytest(path_base=dir, file_report=FILE_REPORT)
