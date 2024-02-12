@@ -18,7 +18,7 @@ setup(
     ),
     entry_points={
         "console_scripts": [
-            "judge = judge.judge:main"
+            "judge = judge:main"
         ]
     },
     install_requires=[
