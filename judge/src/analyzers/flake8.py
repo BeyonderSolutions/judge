@@ -1,4 +1,3 @@
-import io
 import os
 import re
 import sys
@@ -8,43 +7,38 @@ from rich import print
 from rich.panel import Panel
 from rich.table import Table
 
+from ..classes import FakeFile
+from ..utils import md_link
+
 LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
 
-class FakeFile(io.StringIO):
-    def __init__(self):
-        super().__init__()
-        self.buffer = self
-
-    def write(self, s):
-        if isinstance(s, bytes):
-            # Decode bytes to a string and write
-            s = s.decode('utf-8')
-        super().write(s)
-
-    def getvalue(self):
-        return super().getvalue()
+def analyze_flake8(path_base: str, file_report: str, settings: dict = {}):
+    report = _flake8_to_dict(
+        path_to_code=path_base,
+        settings=settings.get("flake8", {})
+    )
+    _print_flake8_report(report, file_report)
 
 
-def main():
-    dir = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
-    report = flake8_to_dict(dir)
-    markdown_file_path = 'judge_report.md'
-    print_flake8_report(report, markdown_file_path)
-
-
-def flake8_to_dict(path_to_code):
+def _flake8_to_dict(path_to_code: str, settings: dict = {}):
+    # Arguments for flake8.
+    ignore = f"--ignore={','.join(settings['ignore'])}" \
+        if settings.get("ignore", []) else ""
+    exclude = str(','.join(settings.get("exclude", [])))
+    # Initialize the flake8 application.
+    app = f8.Application()
+    # Base directory for relative paths.
     base_dir = os.path.commonpath([path_to_code])
     # Temporary redirect stdout to the custom FakeFile
     original_stdout = sys.stdout
     sys.stdout = FakeFile()
-    # Initialize and run flake8
-    app = f8.Application()
+    # Initialize and run flake8.
     app.initialize([
-        "--ignore=E402,F401,F403",
+        ignore,
         "--exclude=*env*,.*env*,"
         "your_project/external_packages,"
-        "*/site-packages/*",
+        "*/site-packages/*," + exclude,
         path_to_code
     ])
     app.run_checks()
@@ -77,11 +71,7 @@ def flake8_to_dict(path_to_code):
     return results
 
 
-def md_link(content, link):
-    return f"[{content}]({link})"
-
-
-def print_flake8_report(report, markdown_file_path):
+def _print_flake8_report(report, markdown_file_path):
     with open(markdown_file_path, 'w', encoding="utf-8") as md_file:
         md_file.write("# ⚖️ Judge Report\n")
         md_file.write("## ❄️ flake8\n")
@@ -91,7 +81,13 @@ def print_flake8_report(report, markdown_file_path):
         if not report:
             message = "✅ No issues found!"
             md_file.write(f"\n>{message}\n")
-            print(Panel(message, title="Success", expand=False, style="green"))
+            print(Panel(
+                message,
+                title="Success",
+                title_align="left",
+                expand=False,
+                style="green"
+            ))
             return
         # Loop through each issue.
         for file_path, issues in report.items():
@@ -122,7 +118,3 @@ def print_flake8_report(report, markdown_file_path):
                 )
             # Print the table to console
             print(table)
-
-
-if __name__ == "__main__":
-    main()
