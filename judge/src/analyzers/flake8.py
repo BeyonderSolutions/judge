@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+from typing import Dict
 
 import flake8.main.application as f8
 from rich import print
@@ -13,7 +14,7 @@ from ..utils import md_link
 LINK_PEP8 = "https://peps.python.org/pep-0008/"
 
 
-def analyze_flake8(path_base: str, file_report: str, settings: dict = {}):
+def analyze_flake8(path_base: str, file_report: str, settings: Dict = {}):
     report = _flake8_to_dict(
         path_to_code=path_base,
         settings=settings.get("flake8", {})
@@ -21,7 +22,7 @@ def analyze_flake8(path_base: str, file_report: str, settings: dict = {}):
     _print_flake8_report(report, file_report)
 
 
-def _flake8_to_dict(path_to_code: str, settings: dict = {}):
+def _flake8_to_dict(path_to_code: str, settings: Dict = {}):
     # Arguments for flake8.
     ignore = f"--ignore={','.join(settings['ignore'])}" \
         if settings.get("ignore", []) else ""
