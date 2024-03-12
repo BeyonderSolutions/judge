@@ -1,35 +1,52 @@
 import os
 import re
 import xml.etree.ElementTree as ET
+from typing import Dict, List
 
 import pytest
+
+PATH_XML = "pytest_report.xml"
 
 
 def analyze_pytest(
     path_base: str,
     file_report: str,
-    report_xml_path="pytest_report.xml"
-):
+    settings: Dict = {}
+) -> None:
+    # Retrieve the settings for pytest.
+    settings = settings.get("pytest", {})
+    paths: List = settings.get("paths", [])
+    if not paths:
+        paths.append(path_base)
     # Run pytest and generate an XML report.
-    pytest.main([
-        path_base,
-        '--no-header',
-        '--no-summary',
-        '-rA',
-        f'--junitxml={report_xml_path}'
-    ])
-    # Parse the XML report and write to the markdown report.
-    _parse_and_write_pytest_report(report_xml_path, file_report)
+    first = True
+    for path in paths:
+        pytest.main([
+            path,
+            '--no-header',
+            '--no-summary',
+            '-rA',
+            f'--junitxml={PATH_XML}'
+        ])
+        # Parse the XML report and write to the markdown report.
+        _parse_and_write_pytest_report(file_report, path=path, first=first)
+        first = False
 
 
-def _parse_and_write_pytest_report(report_xml_path, markdown_file_path):
+def _parse_and_write_pytest_report(
+    markdown_file_path: str,
+    path: str,
+    first: bool
+) -> None:
     # Parse the XML file.
-    tree = ET.parse(report_xml_path)
+    tree = ET.parse(PATH_XML)
     root = tree.getroot()
 
     with open(markdown_file_path, 'a', encoding="utf-8") as md_file:
-        md_file.write("\n## 🧪 pytest\n")
-        md_file.write("Automated unit testing for Python.\n")
+        if first:
+            md_file.write("\n## 🧪 pytest\n")
+            md_file.write("Automated unit testing for Python.\n")
+        md_file.write(f"\n### 📁 `{path}`\n")
         testcases = root.findall(".//testcase")
         failures_present = False
         # Loop through test cases.
@@ -39,7 +56,7 @@ def _parse_and_write_pytest_report(report_xml_path, markdown_file_path):
                 failures_present = True
                 test_name = f"`{testcase.attrib.get('classname')}`" \
                     f"::`{testcase.attrib.get('name')}`"
-                md_file.write(f"### 📄 {test_name}\n")
+                md_file.write(f"#### 📄 `{test_name}`\n")
                 for failure in failures:
                     sections = failure.text.strip().split("\n_")
                     for index, section in enumerate(sections):
@@ -57,4 +74,4 @@ def _parse_and_write_pytest_report(report_xml_path, markdown_file_path):
         if not failures_present:
             md_file.write("\n>✅ All tests passed!\n")
     # Delete the pytest_report.xml file
-    os.remove(report_xml_path)
+    os.remove(PATH_XML)

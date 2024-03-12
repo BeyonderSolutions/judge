@@ -26,5 +26,6 @@ def main():
     if "pytest" in runnables:
         analyze_pytest(
             path_base=dir,
-            file_report=FILE_REPORT
+            file_report=FILE_REPORT,
+            settings=settings
         )
